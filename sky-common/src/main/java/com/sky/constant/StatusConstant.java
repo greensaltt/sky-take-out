@@ -7,7 +7,7 @@ public class StatusConstant {
 
     //启用
     // final：不可改变值 static：表示ENABLE为一个类级别的常量
-    // 任意对象可以xxx.ENABLE直接访问
+    // 可以StatusConstant.ENABLE直接访问
     public static final Integer ENABLE = 1;
 
     //禁用
