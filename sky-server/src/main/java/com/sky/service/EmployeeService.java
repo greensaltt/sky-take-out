@@ -5,6 +5,7 @@ import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.result.PageResult;
+import io.swagger.models.auth.In;
 
 public interface EmployeeService {
 
@@ -22,4 +23,6 @@ public interface EmployeeService {
     void save(EmployeeDTO employeeDTO);
 
     PageResult pageQuerry(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void startOrStop(Integer status, long id);
 }
