@@ -82,13 +82,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 为employee设置状态
         employee.setStatus(StatusConstant.ENABLE);
 
+        // 此处使用了注解进行公共字段设置
+
         // 为employee设置创建、更新时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        // employee.setCreateTime(LocalDateTime.now());
+        // employee.setUpdateTime(LocalDateTime.now());
 
         // 为employee设置创建、更新人
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // employee.setCreateUser(BaseContext.getCurrentId());
+        // employee.setUpdateUser(BaseContext.getCurrentId());
 
         // 插入数据
         employeeMapper.insert(employee);
@@ -115,11 +117,43 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param status
      * @param id
      */
-    public void startOrStop(Integer status, long id) {
+    public void startOrStop(Integer status, Long id) {
         Employee employee = Employee.builder()
                 .status(status)
                 .id(id)
                 .build();
+
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    public Employee getById(Long id) {
+        // 获取对象
+        Employee employee = employeeMapper.getById(id);
+        // 修改密码，避免泄露
+        employee.setPassword("****");
+        return employee;
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        // 复制对象
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 更新相关属性
+        /*
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employee.setUpdateTime(LocalDateTime.now());
+        */
+        // 此处使用了注解进行公共字段设置
 
         employeeMapper.update(employee);
     }

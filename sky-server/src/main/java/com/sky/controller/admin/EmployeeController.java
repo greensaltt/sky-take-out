@@ -107,9 +107,35 @@ public class EmployeeController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("设置员工状态接口")
-    public Result startOrStop(@PathVariable Integer status, long id) {
+    public Result startOrStop(@PathVariable Integer status, Long id) {
         log.info("启用禁用员工账号,{}{}", status, id);
         employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据id取得员工信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("获取员工信息接口")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("修改员工信息,id为：{}",id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改员工信息接口")
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("编辑员工信息,{}",employeeDTO);
+        employeeService.update(employeeDTO);
         return Result.success();
     }
 
