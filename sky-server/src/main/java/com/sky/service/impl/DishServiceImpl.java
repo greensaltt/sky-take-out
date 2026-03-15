@@ -207,4 +207,14 @@ public class DishServiceImpl implements DishService {
                 .build();
         setmealMapper.update(setmeal);
     }
+
+    /**
+     * 修改菜品状态
+     * @param status
+     * @param dishId
+     */
+    public void StartOrStop(Integer status, Long dishId) {
+        Dish dish = Dish.builder().status(status).id(dishId).build();
+        dishMapper.update(dish);
+    }
 }

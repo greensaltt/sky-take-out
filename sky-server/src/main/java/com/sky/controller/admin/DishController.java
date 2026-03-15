@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -13,9 +14,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @Api(tags = "菜品相关接口")
@@ -23,6 +26,8 @@ import java.util.List;
 @Slf4j
 public class DishController {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Autowired
     private DishService dishService;
 
@@ -48,6 +53,10 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("添加菜品:{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
+        // 删除对应分类的redis
+        String pattern = "dish_" + dishDTO.getCategoryId();
+        cleanCache(pattern);
         return Result.success();
     }
 
@@ -74,6 +83,10 @@ public class DishController {
     public Result remove(@RequestParam List<Long> ids) {
         log.info("删除菜品:{}", ids);
         dishService.removeDish(ids);
+
+        String pattern = "dish_*";
+        cleanCache(pattern);
+
         return Result.success();
     }
 
@@ -100,7 +113,34 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("正在修改菜品:{}", dishDTO);
         dishService.updateWithFlavors(dishDTO);
+
+        String pattern = "dish_*";
+        cleanCache(pattern);
+
         return Result.success();
+    }
+
+    /**
+     * 修改菜品状态
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("设置菜品状态接口")
+    public Result setStatus(@PathVariable Integer status, Long id) {
+        log.info("修改菜品 {} 状态为：{}", id,
+                status == StatusConstant.ENABLE? "起售": "停售");
+
+        dishService.StartOrStop(status, id);
+
+        cleanCache("dish_*");
+        return Result.success();
+    }
+
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 
 }
